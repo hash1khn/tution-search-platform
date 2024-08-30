@@ -1,36 +1,120 @@
-This is a [Next.js](https://nextjs.org/) project bootstrapped with [`create-next-app`](https://github.com/vercel/next.js/tree/canary/packages/create-next-app).
+# Tuition Searching Platform
+
+## Overview
+
+The **Tuition Searching Platform** is a comprehensive web application designed to connect students with teachers in Pakistan. The platform allows teachers to offer tutoring services, while students can search for, hire, and engage teachers based on various criteria such as subjects, grades, and location. The application supports both online and physical tutoring sessions, and includes advanced features like chat functionality, contract management, notifications, and integration with Gemini LLM for a chatbot to assist users.
+
+## Table of Contents
+
+- [Features](#features)
+- [Tech Stack](#tech-stack)
+- [Getting Started](#getting-started)
+  - [Prerequisites](#prerequisites)
+  - [Installation](#installation)
+  - [Running the Project](#running-the-project)
+- [Environment Variables](#environment-variables)
+- [Project Structure](#project-structure)
+- [API Documentation](#api-documentation)
+- [Testing](#testing)
+- [Contributing](#contributing)
+- [License](#license)
+
+## Features
+
+- **User Authentication**: Secure login and signup with JWT-based authentication.
+- **Teacher and Student Profiles**: Manage detailed profiles for both students and teachers.
+- **Search Functionality**: Search for teachers based on subjects, grades, availability, and location.
+- **Contract Management**: Create and manage contracts between students and teachers.
+- **Chat System**: Real-time chat between students and teachers.
+- **Notifications**: Notification system for contract updates, chat messages, and more.
+- **LLM Integration**: Gemini LLM-powered chatbot for assisting users on the platform.
+
+## Tech Stack
+
+- **Frontend**: Next.js, React, Redux, Tailwind CSS (optional)
+- **Backend**: Next.js API routes, Node.js, PostgreSQL
+- **Authentication**: JWT (JSON Web Tokens)
+- **LLM Integration**: Gemini LLM
+- **State Management**: Redux Toolkit
+- **Styling**: CSS Modules, Tailwind CSS (optional)
+- **Testing**: Jest, React Testing Library, Postman (for API testing)
 
 ## Getting Started
 
-First, run the development server:
+### Prerequisites
+
+Make sure you have the following installed on your machine:
+
+- [Node.js](https://nodejs.org/) (v14.x or later)
+- [npm](https://www.npmjs.com/) (v6.x or later)
+- [PostgreSQL](https://www.postgresql.org/) (or another relational database)
+- [Git](https://git-scm.com/)
+
+### Installation
+
+1. **Clone the Repository**
+
+   ```bash
+   git clone https://github.com/your-username/tuition-searching-platform.git
+   cd tuition-searching-platform
+   ```
+2. **Install Dependencies**
+   ```bash
+   npm install
+
+   ```
+
+
+3. **Set Up Environment Variables**
+
+Create a .env.local file in the root of your project with the following content:
+
+  ```bash
+  DATABASE_URL=postgres://username:password@localhost:5432/your_database
+  JWT_SECRET=your_jwt_secret_key
+  GEMINI_SECRET_KEY=your_gemini_secret_key
+  NODE_ENV=development
+  NEXT_PUBLIC_API_URL=http://localhost:3000/api
+  ```
+4. Start the server
 
 ```bash
 npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
 ```
+## API Documentation
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+### API endpoints are organized under the /api/ directory. Here’s a quick overview:
 
-You can start editing the page by modifying `app/page.js`. The page auto-updates as you edit the file.
+### Authentication: /api/auth/
 
-This project uses [`next/font`](https://nextjs.org/docs/basic-features/font-optimization) to automatically optimize and load Inter, a custom Google Font.
+POST /api/auth/login: Authenticate a user and return a JWT.
+POST /api/auth/signup: Register a new user.
 
-## Learn More
+### Teachers: /api/teachers/
 
-To learn more about Next.js, take a look at the following resources:
+GET /api/teachers: Retrieve a list of teachers.
+GET /api/teachers/[id]: Retrieve a specific teacher's details.
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+### Students: /api/students/
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js/) - your feedback and contributions are welcome!
+GET /api/students: Retrieve a list of students.
+GET /api/students/[id]: Retrieve a specific student's details.
 
-## Deploy on Vercel
+### Contracts: /api/contracts/
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+POST /api/contracts: Create a new contract.
+GET /api/contracts/[id]: Retrieve contract details.
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/deployment) for more details.
+### Chat: /api/chat/
+
+POST /api/chat: Send a chat message.
+GET /api/chat/[id]: Retrieve chat history.
+
+Refer to the docs/api-documentation.md file for detailed API documentation.
+
+## Contributing
+We welcome contributions to the Tuition Searching Platform! Please follow these steps to contribute:
+
+## License
+This project is licensed under the MIT License. See the LICENSE file for more details.
+
