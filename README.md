@@ -15,7 +15,6 @@ The **Tuition Searching Platform** is a comprehensive web application designed t
 - [Environment Variables](#environment-variables)
 - [Project Structure](#project-structure)
 - [API Documentation](#api-documentation)
-- [Testing](#testing)
 - [Contributing](#contributing)
 - [License](#license)
 
