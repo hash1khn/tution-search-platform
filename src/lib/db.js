@@ -1,14 +1,16 @@
-// lib/db.js
-const { Pool } = require('pg');
-require('dotenv').config();  // Load environment variables
+import pg from 'pg';
+import dotenv from 'dotenv';
 
-// Initialize a connection pool with PostgreSQL
-const pool = new Pool({
-  connectionString: process.env.DATABASE_URL,
-  ssl: process.env.NODE_ENV === 'production' ? { rejectUnauthorized: false } : false,
-});
+dotenv.config();
 
-// Export the query method to interact with the database
-module.exports = {
-  query: (text, params) => pool.query(text, params),
-};
+const { Client } = pg;
+
+const connectionString = process.env.DATABASE_URL;
+
+console.log("Database connection string: ", connectionString);
+
+export function createClient() {
+    return new Client({
+        connectionString,
+    });
+}

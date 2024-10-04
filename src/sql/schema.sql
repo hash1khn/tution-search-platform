@@ -104,4 +104,3 @@ CREATE TABLE reviews (
     review_text TEXT,
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
-
