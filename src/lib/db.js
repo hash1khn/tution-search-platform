@@ -3,14 +3,28 @@ import dotenv from 'dotenv';
 
 dotenv.config();
 
-const { Client } = pg;
+const { Pool } = pg;
 
-const connectionString = process.env.DATABASE_URL;
+// Initialize the connection pool
+const pool = new Pool({
+    connectionString: process.env.DATABASE_URL,
+    ssl: {
+        rejectUnauthorized: false, // Optional: depending on your environment (e.g., Heroku)
+    },
+});
 
-console.log("Database connection string: ", connectionString);
+console.log("Database connection initialized.");
 
-export function createClient() {
-    return new Client({
-        connectionString,
-    });
+// Reusable function to run queries
+export async function query(text, params) {
+    const start = Date.now();
+    try {
+        const res = await pool.query(text, params);
+        const duration = Date.now() - start;
+        console.log('Executed query', { text, duration, rows: res.rowCount });
+        return res;
+    } catch (err) {
+        console.error('Query error', err.message, err.stack);
+        throw err;
+    }
 }
