@@ -1,94 +1,104 @@
+-- Cities Table
+CREATE TABLE cities (
+    city_id SERIAL PRIMARY KEY,
+    city_name VARCHAR(255) NOT NULL,
+    region VARCHAR(255) NOT NULL
+);
+
+-- Grade Levels Table
+CREATE TABLE grade_levels (
+    grade_level_id SERIAL PRIMARY KEY,
+    domain VARCHAR(50) NOT NULL,  -- E.g., O-level, A-level, Intermediate
+    sub_level VARCHAR(50),  -- E.g., O1, O2, AS, A2, etc.
+    parent_level_id INT REFERENCES grade_levels(grade_level_id)  -- For hierarchical levels
+);
+
+-- Languages Table
+CREATE TABLE languages (
+    language_id SERIAL PRIMARY KEY,
+    name VARCHAR(50) NOT NULL  -- Language name (e.g., English, Spanish)
+);
+
 -- Users Table
 CREATE TABLE users (
-    id SERIAL PRIMARY KEY,
+    user_id SERIAL PRIMARY KEY,
     email VARCHAR(255) UNIQUE NOT NULL,
     password_hash VARCHAR(255) NOT NULL,
     name VARCHAR(255) NOT NULL,
     phone_number VARCHAR(20),
+    gender VARCHAR(10),
+    age INT,
     role VARCHAR(20) NOT NULL CHECK (role IN ('teacher', 'student', 'admin')),
     profile_picture VARCHAR(255),
+    city_id INT REFERENCES cities(city_id) ON DELETE SET NULL,
+    area VARCHAR(255) NOT NULL,  -- Area information
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
-);
-
--- Locations Table
-CREATE TABLE locations (
-    id SERIAL PRIMARY KEY,
-    city VARCHAR(255) NOT NULL,
-    area VARCHAR(255) NOT NULL,
-    region VARCHAR(255) NOT NULL
 );
 
 -- Subjects Table
 CREATE TABLE subjects (
-    id SERIAL PRIMARY KEY,
+    subject_id SERIAL PRIMARY KEY,
     name VARCHAR(255) NOT NULL,
     description TEXT
 );
 
--- Teachers Table (with hourly_rate and subject they teach)
+-- Teachers Table
 CREATE TABLE teachers (
-    id SERIAL PRIMARY KEY REFERENCES users(id) ON DELETE CASCADE,
+    teacher_id SERIAL PRIMARY KEY,
+    user_id INT UNIQUE NOT NULL REFERENCES users(user_id) ON DELETE CASCADE,
     teaching_mode VARCHAR(20) NOT NULL CHECK (teaching_mode IN ('online', 'physical', 'both')),
     bio TEXT,
-    location_id INT REFERENCES locations(id),
-    verified BOOLEAN DEFAULT FALSE,
-    experience_years INT, -- Years of teaching experience
-    education TEXT, -- Educational background
-    languages TEXT[], -- Languages spoken by the teacher
-    rating DECIMAL(3, 2), -- Teacher's average rating
-    hourly_rate DECIMAL(10, 2), -- Teacher's hourly rate
+    is_verified BOOLEAN DEFAULT FALSE,
+    experience_years INT,
+    education VARCHAR(255),  -- Education background
+    rating DECIMAL(3, 2),  -- Rating out of 5
+    hourly_rate DECIMAL(10, 2),  -- Hourly rate in decimal format
+    grade_level_id INT REFERENCES grade_levels(grade_level_id) ON DELETE SET NULL,  -- Reference to grade levels
+    language_id INT REFERENCES languages(language_id) ON DELETE SET NULL,  -- Reference to languages
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
 
--- TeacherSubjects Table (links teachers to the subjects they teach)
+-- Students Table
+CREATE TABLE students (
+    student_id SERIAL PRIMARY KEY,
+    user_id INT UNIQUE NOT NULL REFERENCES users(user_id) ON DELETE CASCADE,
+    grade_level_id INT REFERENCES grade_levels(grade_level_id) ON DELETE SET NULL,  -- Reference to grade levels
+    guardian_contact VARCHAR(20),
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+);
+
+-- Teacher Subjects Table
 CREATE TABLE teacher_subjects (
-    id SERIAL PRIMARY KEY,
-    teacher_id INT REFERENCES teachers(id) ON DELETE CASCADE,
-    subject_id INT REFERENCES subjects(id) ON DELETE CASCADE
+    teacher_subject_id SERIAL PRIMARY KEY,
+    teacher_id INT NOT NULL REFERENCES teachers(teacher_id) ON DELETE CASCADE,
+    subject_id INT NOT NULL REFERENCES subjects(subject_id) ON DELETE CASCADE
 );
 
--- TeacherGrades Table (stores the grade levels teachers can teach)
-CREATE TABLE teacher_grades (
-    id SERIAL PRIMARY KEY,
-    teacher_id INT REFERENCES teachers(id) ON DELETE CASCADE,
-    grade VARCHAR(50)
-);
-
--- TeacherAvailability Table (stores the availability of teachers)
+-- Teacher Availability Table
 CREATE TABLE teacher_availability (
-    id SERIAL PRIMARY KEY,
-    teacher_id INT REFERENCES teachers(id) ON DELETE CASCADE,
+    availability_id SERIAL PRIMARY KEY,
+    teacher_id INT NOT NULL REFERENCES teachers(teacher_id) ON DELETE CASCADE,
     day VARCHAR(10) NOT NULL CHECK (day IN ('Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday')),
     start_time TIME NOT NULL,
     end_time TIME NOT NULL
 );
 
--- Students Table (with preferred subjects and guardian contact)
-CREATE TABLE students (
-    id SERIAL PRIMARY KEY REFERENCES users(id) ON DELETE CASCADE,
-    grade_level VARCHAR(50) NOT NULL,
-    location_id INT REFERENCES locations(id),
-    preferred_subjects TEXT[], -- Subjects the student prefers to learn
-    guardian_contact VARCHAR(20), -- Contact information for a parent or guardian
-    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
-);
-
--- StudentSubjects Table (links students to subjects they want to learn)
+-- Student Subjects Table
 CREATE TABLE student_subjects (
-    id SERIAL PRIMARY KEY,
-    student_id INT REFERENCES students(id) ON DELETE CASCADE,
-    subject_id INT REFERENCES subjects(id) ON DELETE CASCADE
+    student_subject_id SERIAL PRIMARY KEY,
+    student_id INT NOT NULL REFERENCES students(student_id) ON DELETE CASCADE,
+    subject_id INT NOT NULL REFERENCES subjects(subject_id) ON DELETE CASCADE
 );
 
--- HiringContracts Table (contracts between students and teachers)
+-- Hiring Contracts Table
 CREATE TABLE hiring_contracts (
-    id SERIAL PRIMARY KEY,
-    student_id INT REFERENCES students(id) ON DELETE CASCADE,
-    teacher_id INT REFERENCES teachers(id) ON DELETE CASCADE,
-    subject_id INT REFERENCES subjects(id) ON DELETE CASCADE,
+    contract_id SERIAL PRIMARY KEY,
+    student_id INT NOT NULL REFERENCES students(student_id) ON DELETE CASCADE,
+    teacher_id INT NOT NULL REFERENCES teachers(teacher_id) ON DELETE CASCADE,
+    subject_id INT NOT NULL REFERENCES subjects(subject_id) ON DELETE CASCADE,
     start_date DATE NOT NULL,
     end_date DATE NOT NULL,
     mode VARCHAR(20) NOT NULL CHECK (mode IN ('online', 'physical')),
@@ -98,32 +108,32 @@ CREATE TABLE hiring_contracts (
     updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
 
--- Reviews Table (stores individual reviews and ratings)
+-- Reviews Table
 CREATE TABLE reviews (
-    id SERIAL PRIMARY KEY,
-    contract_id INT REFERENCES hiring_contracts(id) ON DELETE CASCADE,
-    student_id INT REFERENCES students(id) ON DELETE CASCADE,
-    teacher_id INT REFERENCES teachers(id) ON DELETE CASCADE,
-    rating INT CHECK (rating BETWEEN 1 AND 5), -- Individual rating for this review
-    review_text TEXT, -- Textual feedback
+    review_id SERIAL PRIMARY KEY,
+    contract_id INT NOT NULL REFERENCES hiring_contracts(contract_id) ON DELETE CASCADE,
+    student_id INT NOT NULL REFERENCES students(student_id) ON DELETE CASCADE,
+    teacher_id INT NOT NULL REFERENCES teachers(teacher_id) ON DELETE CASCADE,
+    rating INT CHECK (rating BETWEEN 1 AND 5),
+    review_text TEXT,
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
 
--- Notifications Table (tracks notifications sent to users)
+-- Notifications Table
 CREATE TABLE notifications (
-    id SERIAL PRIMARY KEY,
-    user_id INT REFERENCES users(id) ON DELETE CASCADE,
+    notification_id SERIAL PRIMARY KEY,
+    user_id INT NOT NULL REFERENCES users(user_id) ON DELETE CASCADE,
     content TEXT NOT NULL,
     type VARCHAR(50) CHECK (type IN ('contract_update', 'review', 'general')),
     is_read BOOLEAN DEFAULT FALSE,
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
 
--- Payments Table (tracks payments related to contracts)
+-- Payments Table
 CREATE TABLE payments (
-    id SERIAL PRIMARY KEY,
-    contract_id INT REFERENCES hiring_contracts(id) ON DELETE CASCADE,
-    student_id INT REFERENCES students(id) ON DELETE CASCADE,
+    payment_id SERIAL PRIMARY KEY,
+    contract_id INT NOT NULL REFERENCES hiring_contracts(contract_id) ON DELETE CASCADE,
+    student_id INT NOT NULL REFERENCES students(student_id) ON DELETE CASCADE,
     amount DECIMAL(10, 2) NOT NULL,
     payment_status VARCHAR(20) CHECK (payment_status IN ('pending', 'completed', 'failed')),
     payment_method VARCHAR(50),

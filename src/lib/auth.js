@@ -2,26 +2,26 @@ import bcrypt from 'bcryptjs';
 import jwt from 'jsonwebtoken';
 
 // Function to hash a password
+// Hash the password before storing in the database
 export async function hashPassword(password) {
     const salt = await bcrypt.genSalt(10);
-    const hashedPassword = await bcrypt.hash(password, salt);
-    return hashedPassword;
+    return await bcrypt.hash(password, salt);
 }
 
-// Function to verify a password during login
+// Compare plain password with hashed password
 export async function verifyPassword(plainPassword, hashedPassword) {
-    const isMatch = await bcrypt.compare(plainPassword, hashedPassword);
-    return isMatch;
+    return await bcrypt.compare(plainPassword, hashedPassword);
 }
 
-// Function to generate a JWT token
+// Generate JWT token
 export function generateToken(user) {
-    // Create a token payload containing user id and role
-    const payload = { userId: user.id, role: user.role };
-    
-    // Sign the token with a secret and set the expiration (e.g., 1h)
-    const token = jwt.sign(payload, process.env.JWT_SECRET, { expiresIn: '1h' });
-    return token;
+    const payload = {
+        id: user.user_id,   // unique user id
+        email: user.email,  // user's email
+        role: user.role,    // user's role (teacher, student, admin)
+    };
+
+    return jwt.sign(payload, process.env.JWT_SECRET, { expiresIn: '72h' });
 }
 
 // Function to verify a JWT token
