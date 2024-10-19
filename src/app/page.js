@@ -1,82 +1,70 @@
-"use client"; // This marks the component as a client component
+'use client';
+import { useEffect, useState } from 'react';
+import { Box, Typography, CircularProgress, Container } from '@mui/material';
+import Navbar from '@/components/navbar';
+import Footer from '@/components/footer';
 
-import { useEffect, useState } from "react";
-import Image from "next/image";
-import styles from "./page.module.css";
 
 export default function Home() {
-  const [dbStatus, setDbStatus] = useState("Checking...");
+  const [isConnected, setIsConnected] = useState(null);
+  const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    const checkDatabase = async () => {
+    const checkHealth = async () => {
       try {
-        const res = await fetch("/api/db-check");
-        const data = await res.json();
-        setDbStatus(data.message);
+        const response = await fetch('/api/health');
+        const data = await response.json();
+
+        if (response.ok) {
+          setIsConnected(true);
+        } else {
+          setIsConnected(false);
+        }
       } catch (error) {
-        setDbStatus("Error: Unable to check the database.");
+        console.error('Error fetching health status:', error);
+        setIsConnected(false);
+      } finally {
+        setLoading(false);
       }
     };
 
-    checkDatabase();
+    checkHealth();
   }, []);
 
   return (
-    <main className={styles.main}>
-      <div className={styles.description}>
-        <p>
-          Get started by editing&nbsp;
-          <code className={styles.code}>app/page.js</code>
-        </p>
-        <div>
-          <a
-            href="https://vercel.com?utm_source=create-next-app&utm_medium=appdir-template&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            By{" "}
-            <Image
-              src="/vercel.svg"
-              alt="Vercel Logo"
-              className={styles.vercelLogo}
-              width={100}
-              height={24}
-              priority
-            />
-          </a>
-        </div>
-      </div>
+    <>
+      <Navbar />
+      <Container maxWidth="lg" sx={{ minHeight: '100vh', display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', backgroundColor: 'rgb(var(--background-color))', p: 4 }}>
+        
+        {/* Connection Status Indicator */}
+        <Box sx={{ textAlign: 'center', mt: 4, p: 2, color: 'rgb(var(--background-color))' }}>
+          {loading ? (
+            <CircularProgress />
+          ) : isConnected ? (
+            <Typography variant="h6" color="success.main">
+              Database Connected!
+            </Typography>
+          ) : (
+            <Typography variant="h6" color="error.main">
+              Database Not Connected!
+            </Typography>
+          )}
+        </Box>
 
-      <div className={styles.center}>
-        <Image
-          className={styles.logo}
-          src="/next.svg"
-          alt="Next.js Logo"
-          width={180}
-          height={37}
-          priority
-        />
-      </div>
+        {/* Credits Section */}
+        <Box sx={{ mt: 8, textAlign: 'center' }}>
+          <Typography variant="subtitle1">
+            By Talha Idrees, Sohail Ahmed, and Zain
+          </Typography>
+        </Box>
 
-      <div className={styles.grid}>
-        <a
-          href="https://nextjs.org/docs?utm_source=create-next-app&utm_medium=appdir-template&utm_campaign=create-next-app"
-          className={styles.card}
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <h2>
-            Docs <span>-&gt;</span>
-          </h2>
-          <p>Find in-depth information about Next.js features and API.</p>
-        </a>
-
-        {/* Displaying the database status */}
-        <div className={styles.card}>
-          <h2>Database Status</h2>
-          <p>{dbStatus}</p>
-        </div>
-      </div>
-    </main>
+        {/* Coming Soon Section */}
+        <Box sx={{ mt: 2, textAlign: 'center' }}>
+          <Typography variant="h5">
+            Coming Soon!
+          </Typography>
+        </Box>
+      </Container>
+    </>
   );
 }

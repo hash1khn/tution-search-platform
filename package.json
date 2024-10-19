@@ -11,17 +11,22 @@
   "dependencies": {
     "@emotion/react": "^11.13.3",
     "@emotion/styled": "^11.13.0",
-    "@mui/material": "^6.0.1",
-    "@next/swc-darwin-x64": "^14.2.14",
+    "@iconify/react": "^5.0.2",
+    "@mui/material": "^6.1.4",
+    "autosuggest-highlight": "^3.3.4",
     "axios": "^1.7.5",
     "bcrypt": "^5.1.1",
     "bcryptjs": "^2.4.3",
+    "date-fns": "^4.1.0",
     "dotenv": "^16.4.5",
     "jsonwebtoken": "^9.0.2",
+    "lodash": "^4.17.21",
     "next": "^14.2.14",
     "pg": "^8.13.0",
     "react": "^18",
-    "react-dom": "^18"
+    "react-dom": "^18",
+    "simplebar-react": "^3.2.6",
+    "swr": "^2.2.5"
   },
   "devDependencies": {
     "eslint": "^8",
